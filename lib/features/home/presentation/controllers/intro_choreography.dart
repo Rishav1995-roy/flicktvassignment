@@ -26,10 +26,6 @@ abstract final class IntroChoreography {
   static const IntervalSegment money =
       IntervalSegment(0.36, 0.56, curve: AppCurves.silk);
 
-  /// Whole hero promotes from centre toward the top, opening room below.
-  static const IntervalSegment promote =
-      IntervalSegment(0.46, 0.68, curve: AppCurves.emphasised);
-
   /// Top-bar affordances (back already visible; settings fades in).
   static const IntervalSegment topBar =
       IntervalSegment(0.60, 0.78, curve: Curves.easeOut);

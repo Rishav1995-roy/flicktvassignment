@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 
 import '../../../../core/animations/fade_slide_in.dart';
@@ -95,22 +93,11 @@ class _BlinkitMoneyScreenState extends State<BlinkitMoneyScreen>
           // 1. Static cinematic backdrop (cached layer).
           const Positioned.fill(child: HalftoneBackground()),
 
-          // 2. Faint depth watermark bleeding off the bottom edge.
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: -6,
-            child: FadeSlideIn(
-              animation: _intro,
-              segment: IntroChoreography.watermark,
-              beginOffset: const Offset(0, 30),
-              child: const WatermarkText(),
-            ),
-          ),
-
-          // 3. Foreground content.
+          // 2. Foreground content. Honour the bottom inset so nothing clips
+          //    behind the gesture/nav bar. The faint watermark lives at the
+          //    foot of this content flow (below the gift-card row), not as a
+          //    floating layer, so the gift card always sits clearly above it.
           SafeArea(
-            bottom: false,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageGutter),
               child: Column(
@@ -137,7 +124,7 @@ class _BlinkitMoneyScreenState extends State<BlinkitMoneyScreen>
             ),
           ),
 
-          // 4. Confetti burst — on top so it reads as falling in front of the
+          // 3. Confetti burst — on top so it reads as falling in front of the
           //    hero, exactly as in the reference. Isolated + non-interactive.
           ConfettiLayer(progress: _confetti),
         ],
@@ -170,76 +157,88 @@ class _IntroContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Animation<double> promote = IntroChoreography.promote.drive(intro);
+    // Hero (wallet + wordmark). Its entrance is self-driven by its own
+    // segments, so it's a plain const-ish subtree here.
+    final Widget hero = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        WalletBadge(
+          intro: intro,
+          ambient: ambient,
+          segment: IntroChoreography.wallet,
+          size: walletSize,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        BrandLockup(
+          intro: intro,
+          wordmarkSegment: IntroChoreography.wordmark,
+          moneySegment: IntroChoreography.money,
+        ),
+      ],
+    );
 
+    final Widget lowerContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        FeatureList(intro: intro, segments: cardSegments),
+        const SizedBox(height: AppSpacing.lg),
+        FadeSlideIn(
+          animation: intro,
+          segment: IntroChoreography.addMoney,
+          beginOffset: const Offset(0, 24),
+          beginScale: 0.96,
+          child: PrimaryButton(label: 'Add Money', onTap: onAddMoney),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        FadeSlideIn(
+          animation: intro,
+          segment: IntroChoreography.giftTile,
+          beginOffset: const Offset(0, 22),
+          child: ClaimGiftCardTile(onTap: onClaimGift),
+        ),
+      ],
+    );
+
+    // Distribute the free vertical space with flex spacers so the composition
+    // fills the screen on ANY device height (no dead space dumped at the
+    // bottom). The largest share sits *between* the hero and the cards — the
+    // OTT "room opens as the cards arrive" feel — with smaller top/bottom
+    // margins.
+    //
+    // The IntrinsicHeight + min-height ConstrainedBox + scroll view is the
+    // canonical "fill the viewport, but fall back to scrolling if the content
+    // is genuinely taller than the screen" pattern — so the flex layout looks
+    // perfect on normal devices yet can never overflow on very short screens or
+    // at large accessibility text sizes.
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // Space that vertically centres the hero before it promotes upward.
-        final double heroBlock = walletSize + 110;
-        final double centreSpacer =
-            ((constraints.maxHeight - heroBlock) / 2 - 24).clamp(0.0, constraints.maxHeight);
-        const double topSpacer = AppSpacing.sm;
-
-        // The hero + brand never change during the cascade, so build them once
-        // and hand them to the AnimatedBuilder as a cached `child`.
-        final Widget hero = Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            WalletBadge(
-              intro: intro,
-              ambient: ambient,
-              segment: IntroChoreography.wallet,
-              size: walletSize,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            BrandLockup(
-              intro: intro,
-              wordmarkSegment: IntroChoreography.wordmark,
-              moneySegment: IntroChoreography.money,
-            ),
-          ],
-        );
-
-        final Widget lowerContent = Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const SizedBox(height: AppSpacing.md),
-            FeatureList(intro: intro, segments: cardSegments),
-            const SizedBox(height: AppSpacing.lg),
-            FadeSlideIn(
-              animation: intro,
-              segment: IntroChoreography.addMoney,
-              beginOffset: const Offset(0, 24),
-              beginScale: 0.96,
-              child: PrimaryButton(label: 'Add Money', onTap: onAddMoney),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            FadeSlideIn(
-              animation: intro,
-              segment: IntroChoreography.giftTile,
-              beginOffset: const Offset(0, 22),
-              child: ClaimGiftCardTile(onTap: onClaimGift),
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-        );
-
-        return AnimatedBuilder(
-          animation: promote,
-          child: hero,
-          builder: (BuildContext context, Widget? heroChild) {
-            final double spacer = ui.lerpDouble(centreSpacer, topSpacer, promote.value)!;
-            return SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
+        return SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  SizedBox(height: spacer),
-                  heroChild!,
+                  const Spacer(flex: 3),
+                  hero,
+                  const Spacer(flex: 6),
                   lowerContent,
+                  const Spacer(flex: 2),
+                  // Faint watermark sits at the foot of the flow — always
+                  // below the gift-card row, never overlapping it.
+                  FadeSlideIn(
+                    animation: intro,
+                    segment: IntroChoreography.watermark,
+                    beginOffset: const Offset(0, 24),
+                    child: const WatermarkText(),
+                  ),
+                  const Spacer(flex: 1),
                 ],
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
