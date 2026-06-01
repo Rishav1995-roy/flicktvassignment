@@ -93,10 +93,24 @@ class _BlinkitMoneyScreenState extends State<BlinkitMoneyScreen>
           // 1. Static cinematic backdrop (cached layer).
           const Positioned.fill(child: HalftoneBackground()),
 
-          // 2. Foreground content. Honour the bottom inset so nothing clips
-          //    behind the gesture/nav bar. The faint watermark lives at the
-          //    foot of this content flow (below the gift-card row), not as a
-          //    floating layer, so the gift card always sits clearly above it.
+          // 2. Faint depth watermark — a background band pinned to the foot of
+          //    the screen (just above the gesture/nav inset so it never clips).
+          //    The foreground content reserves a matching bottom band, so the
+          //    gift-card row always sits clearly ABOVE this text.
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: context.viewPadding.bottom + AppSpacing.sm,
+            child: FadeSlideIn(
+              animation: _intro,
+              segment: IntroChoreography.watermark,
+              beginOffset: const Offset(0, 20),
+              child: const WatermarkText(),
+            ),
+          ),
+
+          // 3. Foreground content. Honour the bottom inset so nothing clips
+          //    behind the gesture/nav bar.
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageGutter),
@@ -124,7 +138,7 @@ class _BlinkitMoneyScreenState extends State<BlinkitMoneyScreen>
             ),
           ),
 
-          // 3. Confetti burst — on top so it reads as falling in front of the
+          // 4. Confetti burst — on top so it reads as falling in front of the
           //    hero, exactly as in the reference. Isolated + non-interactive.
           ConfettiLayer(progress: _confetti),
         ],
@@ -133,11 +147,9 @@ class _BlinkitMoneyScreenState extends State<BlinkitMoneyScreen>
   }
 }
 
-/// The vertically-choreographed body: the hero promotes from centre toward the
-/// top while the cards / CTA cascade into the space it opens up.
-///
-/// Split into its own widget so the promote rebuild is scoped tightly and the
-/// [Scaffold] above never rebuilds during the animation.
+/// The vertically-choreographed body: the hero sits up top while the cards /
+/// CTA / gift row fill the space below, with leftover height distributed by
+/// flex so the composition fills any screen height.
 class _IntroContent extends StatelessWidget {
   const _IntroContent({
     required this.intro,
@@ -147,6 +159,11 @@ class _IntroContent extends StatelessWidget {
     required this.onAddMoney,
     required this.onClaimGift,
   });
+
+  /// Height reserved at the foot of the content for the background watermark
+  /// (its two-line height plus a comfortable gap) so the gift-card row always
+  /// sits clearly above it with daylight in between.
+  static const double _watermarkBand = 104;
 
   final Animation<double> intro;
   final Animation<double> ambient;
@@ -225,16 +242,10 @@ class _IntroContent extends StatelessWidget {
                   hero,
                   const Spacer(flex: 6),
                   lowerContent,
-                  const Spacer(flex: 2),
-                  // Faint watermark sits at the foot of the flow — always
-                  // below the gift-card row, never overlapping it.
-                  FadeSlideIn(
-                    animation: intro,
-                    segment: IntroChoreography.watermark,
-                    beginOffset: const Offset(0, 24),
-                    child: const WatermarkText(),
-                  ),
-                  const Spacer(flex: 1),
+                  const Spacer(flex: 5),
+                  // Reserve a band at the foot for the background watermark, so
+                  // the gift-card row above can never overlap it (any device).
+                  const SizedBox(height: _watermarkBand),
                 ],
               ),
             ),

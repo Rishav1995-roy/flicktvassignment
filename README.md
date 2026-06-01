@@ -17,16 +17,16 @@ screen, built with **only the Flutter SDK** - no third-party packages. Every flo
 The screen plays a ~3.5s choreographed intro that matches the reference video:
 
 1. A **confetti burst** erupts from behind the hero and rains down (gravity +
-   sway + paper-flip tumble), fading as it falls.
+  sway + paper-flip tumble), fading as it falls.
 2. The **3D wallet** (a gold pouch with a green lining and a white ₹ badge)
-   **drops in from above**, tumbles with a damped-spring rotation, overshoots
+  **drops in from above**, tumbles with a damped-spring rotation, overshoots
    its scale, then settles into a perpetual **idle float + micro-wobble**.
-3. The `**blinkit` / `MONEY`** wordmark rises, with a one-pass **light shimmer\*\*
-   swept across `MONEY`.
+3. The `**blinkit` / `MONEY`** wordmark rises, with a one-pass **light shimmer
+  swept across `MONEY`.
 4. The hero **promotes** from screen-centre toward the top, opening room as the
-   three **benefit cards** cascade in (staggered fade + slide).
+  three **benefit cards** cascade in (staggered fade + slide).
 5. The **Add Money** CTA pops in, the **Claim Gift Card** row follows, the
-   **settings** gear fades into the top bar, and a faint watermark settles in.
+  **settings** gear fades into the top bar, and a faint watermark settles in.
 
 > Reduced-motion users get the final composed frame instantly (the timeline is
 > snapped to its end), respecting `MediaQuery.disableAnimations`.
@@ -135,18 +135,18 @@ lib/
 ### Why this shape?
 
 - **Feature-first**, not layer-first. Everything about "home" lives under
-  `features/home`, so the unit of ownership is a _feature_, not a horizontal
-  slice. Adding "wallet detail" or "transactions" means a new sibling folder,
-  never a sprawling edit across `screens/`, `widgets/`, `models/`.
-- `**core/` knows nothing about features.\** It only ever flows *downhill\*
-  (features depend on core, never the reverse). This keeps it a genuinely
-  reusable foundation and prevents circular coupling.
+`features/home`, so the unit of ownership is a *feature*, not a horizontal
+slice. Adding "wallet detail" or "transactions" means a new sibling folder,
+never a sprawling edit across `screens/`, `widgets/`, `models/`.
+- `**core/` knows nothing about features.* It only ever flows *downhill
+(features depend on core, never the reverse). This keeps it a genuinely
+reusable foundation and prevents circular coupling.
 - **Presentation is split by responsibility:** `screens` orchestrate,
-  `widgets` render, `painters` draw pixels, `controllers` hold timing/logic,
-  `models` are immutable data. A widget never owns business logic; the screen
-  never draws pixels.
+`widgets` render, `painters` draw pixels, `controllers` hold timing/logic,
+`models` are immutable data. A widget never owns business logic; the screen
+never draws pixels.
 - **Relative imports within the package** (enforced by lint) keep modules
-  movable.
+movable.
 
 ## 🎬 Animation architecture - the heart of the project
 
@@ -167,7 +167,7 @@ static List<IntervalSegment> get cards => staggered(count: 3, start: 0.50, end: 
 - **One rebuild source** - fewer tickers, less overhead, trivially disposed.
 - **Re-tunable in one file** - the whole rhythm of the product lives in `IntroChoreography`; you can re-time the sequence without touching widgets.
 
-Two _additional_ controllers exist only because they have genuinely independent
+Two *additional* controllers exist only because they have genuinely independent
 lifecycles:
 
 | Controller | Lifecycle | Drives |
@@ -180,7 +180,7 @@ lifecycles:
 
 - **Explicit** (`AnimationController` + `AnimatedBuilder`) for the choreography and the painters - we need precise, deterministic, multi-property control.
 - **Implicit** (`AnimatedScale` via `Pressable`, implicit color/opacity) for
-  _interaction_ feedback, where "animate to the new value" is exactly right.
+*interaction* feedback, where "animate to the new value" is exactly right.
 
 ### SDK techniques on display
 
@@ -219,19 +219,19 @@ raster + UI threads stay under the 16.6ms budget. The `WalletPainter` and
 ## 🎨 Design system
 
 - **Colours** (`AppColors`) are semantic (`background`, `card`, `textPrimary`)
-  _and_ concrete (`walletGold`\*, `blinkitGreen`) - widgets prefer roles so a re-theme touches one file.
+*and* concrete (`walletGold`, `blinkitGreen`) - widgets prefer roles so a re-theme touches one file.
 - **Gradients** (`AppGradients`) are declared `const` once (page backdrop, top glow, CTA, wallet body/lining) - no per-build allocation.
 - **Typography** (`AppTextStyles`) is a small scale; `fontFamily` is a single
-  switch to pixel-match with a bundled face (see `pubspec.yaml`).
+switch to pixel-match with a bundled face (see `pubspec.yaml`).
 - **Spacing & motion** (`AppSpacing`, `AppDurations`) replace magic numbers, so
-  rhythm and tempo are tunable centrally.
+rhythm and tempo are tunable centrally.
 
 ## ✅ Code-quality bar
 
 - Strict analyzer (`strict-casts/inference/raw-types`) + a tightened lint set on
-  top of `flutter_lints`; a few correctness lints are **errors**.
+top of `flutter_lints`; a few correctness lints are **errors**.
 - `fvm flutter analyze` → **0 issues**. `fvm flutter test` → **green**.
-- Documentation comments explain the _why_, not the _what_.
+- Documentation comments explain the *why*, not the *what*.
 - Every `AnimationController` is disposed; no leaked tickers.
 - No `print`, no `BuildContext`-across-async hazards (lint-guarded).
 
@@ -240,20 +240,20 @@ raster + UI threads stay under the 16.6ms budget. The `WalletPainter` and
 The project was built in vertical, reviewable slices:
 
 1. **Scaffold** - `fvm flutter create` (org `flicktv`, project `rishavdebroy`),
-   pin SDK, set the display name to _Rishav Deb Roy_.
+  pin SDK, set the display name to *Rishav Deb Roy*.
 2. **Core foundation** - constants, M3 dark theme, gradients, text styles,
-   extensions, the stagger/timeline engine, custom curves, reusable
+  extensions, the stagger/timeline engine, custom curves, reusable
    `FadeSlideIn` / `Pressable`, base buttons.
 3. **App shell** - thin `MaterialApp`, named routes, fade-through transition,
-   edge-to-edge system chrome.
+  edge-to-edge system chrome.
 4. **Painters first** (the hard pixels) - wallet, confetti, halftone, phone
-   glyphs - each independently verifiable.
+  glyphs - each independently verifiable.
 5. **Feature widgets** - wallet badge (entrance + idle), brand lockup (shimmer),
-   confetti layer, feature cards/list, gift tile, watermark, top bar.
+  confetti layer, feature cards/list, gift tile, watermark, top bar.
 6. **Orchestration** - `IntroChoreography` (timing as data) + the
-   `BlinkitMoneyScreen` that wires three controllers and the promote layout.
+  `BlinkitMoneyScreen` that wires three controllers and the promote layout.
 7. **Validate** - analyze, widget tests, golden-eyeballing the layout, tune
-   spacing for a clean fit, build the APK.
+  spacing for a clean fit, build the APK.
 
 ## 🌿 Git & branching strategy
 
@@ -301,7 +301,7 @@ chore: tighten lints, add VS Code config and docs
 ## 🏁 Final polish checklist
 
 - Matches the reference: confetti, wallet tumble, brand reveal, card
-  cascade, CTA, gift row, settings gear, watermark
+cascade, CTA, gift row, settings gear, watermark
 - Edge-to-edge, dark status-bar icons, portrait-locked
 - Responsive: hero scales on compact heights; layout fits phone classes
 - Text-scale clamped so accessibility can't break the cinematic layout
@@ -314,8 +314,8 @@ chore: tighten lints, add VS Code config and docs
 
 - **Imports:** relative within `lib/`, `package:` for SDK/Flutter.
 - **Naming:** `*_screen`, `*_painter`, `*_card`; `AppXxx` for design tokens.
-- **No business logic in widgets** — timing lives in `controllers/`, data in
-  `models/`.
+- **No business logic in widgets** - timing lives in `controllers/`, data in
+`models/`.
 - **One widget, one responsibility** - orchestrate / render / draw / hold data.
 
-_Built by **Rishav Deb Roy** for the Flick TV Flutter assignment - SDK-only, animation-first, production-minded._
+*Built by **Rishav Deb Roy** for the Flick TV Flutter assignment - SDK-only, animation-first, production-minded.*

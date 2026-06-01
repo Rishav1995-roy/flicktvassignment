@@ -12,6 +12,8 @@ abstract final class AppTextStyles {
   const AppTextStyles._();
 
   /// Set to a bundled family (e.g. 'Okra') to pixel-match the reference.
+  /// `null` → the platform default (Roboto on Android), which keeps the APK
+  /// lean. See `pubspec.yaml` for how to bundle a custom face.
   static const String? fontFamily = null;
 
   /// "blinkit" wordmark — small, bold, tight.
@@ -74,7 +76,7 @@ abstract final class AppTextStyles {
   /// Faint background watermark at the foot of the screen.
   static const TextStyle watermark = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 34,
+    fontSize: 28,
     height: 1.05,
     fontWeight: FontWeight.w800,
     letterSpacing: 0.5,

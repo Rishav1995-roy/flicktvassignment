@@ -22,7 +22,8 @@ class ClaimGiftCardTile extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: AppColors.card.withValues(alpha: 0.4),
+          // Opaque so the faint watermark band beneath never bleeds through it.
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.5)),
         ),

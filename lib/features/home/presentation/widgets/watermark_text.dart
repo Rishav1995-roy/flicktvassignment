@@ -15,7 +15,7 @@ class WatermarkText extends StatelessWidget {
         'Enjoy seamless\none tap payments',
         textAlign: TextAlign.center,
         style: AppTextStyles.watermark.copyWith(
-          color: AppTextStyles.watermark.color?.withValues(alpha: 0.3),
+          color: AppTextStyles.watermark.color?.withValues(alpha: 0.09),
         ),
       ),
     );
