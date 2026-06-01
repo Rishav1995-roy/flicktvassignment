@@ -1,0 +1,57 @@
+# Static-analysis configuration.
+#
+# Built on top of the Flutter team's recommended lints (`flutter_lints`) and
+# then tightened toward a "senior, production" bar: prefer const, relative
+# imports, explicit return types, and no stray prints. A few correctness-
+# critical lints are promoted to build-breaking errors.
+
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # Promote correctness smells to hard errors so they cannot reach a PR.
+    invalid_annotation_target: error
+    dead_code: error
+    unused_import: error
+    unused_local_variable: error
+    todo: ignore
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - build/**
+
+linter:
+  rules:
+    # Performance / correctness
+    - prefer_const_constructors
+    - prefer_const_constructors_in_immutables
+    - prefer_const_declarations
+    - prefer_const_literals_to_create_immutables
+    - avoid_unnecessary_containers
+    - sized_box_for_whitespace
+    - use_key_in_widget_constructors
+    # NOTE: `avoid_redundant_argument_values` is intentionally omitted — this
+    # codebase passes some defaults explicitly (e.g. `fontFamily`, animation
+    # curves) as self-documentation, which is a deliberate readability choice.
+
+    # Readability / consistency
+    - always_declare_return_types
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - prefer_single_quotes
+    - directives_ordering
+    - sort_child_properties_last
+    - unnecessary_lambdas
+    - prefer_relative_imports
+
+    # Safety
+    - avoid_print
+    - cancel_subscriptions
+    - close_sinks
+    - throw_in_finally
+    - unawaited_futures
+    - use_build_context_synchronously

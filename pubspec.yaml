@@ -1,0 +1,64 @@
+name: rishavdebroy
+description: "Blinkit Money — a cinematic OTT-style wallet intro screen built with the Flutter SDK only (no third-party packages). Flick TV assignment by Rishav Deb Roy."
+# Prevents accidental publishing to pub.dev.
+publish_to: "none"
+
+# version: <semantic-version>+<build-number>
+# Android -> versionName / versionCode, iOS -> CFBundleShortVersionString / CFBundleVersion.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+#
+# DEPENDENCIES
+# Hard constraint for this assignment: NO third-party packages.
+# Everything (confetti, the 3D wallet, the halftone glow, the staggered
+# reveal) is implemented with the Flutter SDK: AnimationController, Tween,
+# CurvedAnimation, AnimatedBuilder, CustomPainter, Transform, ShaderMask, etc.
+# `cupertino_icons` ships with `flutter create` and is part of the SDK family;
+# it is kept only so Cupertino glyphs remain available.
+#
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # Recommended lint set maintained by the Flutter team. Tightened further in
+  # analysis_options.yaml.
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  #
+  # ASSETS
+  # The current screen is 100% code-drawn, so no binary assets are required to
+  # run it. The directories below are scaffolded (see assets/README.md) so the
+  # product can grow without restructuring. Uncomment when real assets land.
+  #
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
+  #   - assets/lottie/
+
+  #
+  # FONTS
+  # The reference uses a clean geometric sans. We default to the platform font
+  # (Roboto on Android) to keep the APK lean and avoid bundling binaries. To
+  # pixel-match, drop a font (e.g. Okra / Inter) into assets/fonts/ and wire it
+  # here, then point AppTextStyles.fontFamily at the family name.
+  #
+  # fonts:
+  #   - family: Okra
+  #     fonts:
+  #       - asset: assets/fonts/Okra-Regular.ttf
+  #       - asset: assets/fonts/Okra-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Okra-Bold.ttf
+  #         weight: 700
+  #       - asset: assets/fonts/Okra-ExtraBold.ttf
+  #         weight: 800

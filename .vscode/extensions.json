@@ -1,0 +1,10 @@
+{
+  "//": "Recommended extensions for contributors. VS Code will prompt to install these.",
+  "recommendations": [
+    "Dart-Code.dart-code",
+    "Dart-Code.flutter",
+    "leoafarias.fvm",
+    "usernamehw.errorlens",
+    "aaron-bond.better-comments"
+  ]
+}

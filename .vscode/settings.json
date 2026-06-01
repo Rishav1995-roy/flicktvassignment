@@ -1,0 +1,27 @@
+{
+  "//": "Point the Dart/Flutter extensions at the FVM-pinned SDK so the editor, analyzer and CLI all use the same Flutter version.",
+  "dart.flutterSdkPath": ".fvm/flutter_sdk",
+
+  "editor.formatOnSave": true,
+  "editor.rulers": [90],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.selectionHighlight": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  },
+
+  "files.exclude": {
+    "**/.fvm/versions": true
+  },
+  "search.exclude": {
+    "**/.fvm": true,
+    "**/build": true
+  },
+  "dart.lineLength": 90
+}
